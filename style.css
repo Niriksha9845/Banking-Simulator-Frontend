@@ -1,0 +1,37 @@
+body{
+    font-family:Arial;
+    margin : 20px;
+}
+
+button{
+    margin:5px;
+    padding: 8px 14px;
+    cursor:pointer;
+    border-radius:15px;
+    border:2px solid gold;
+    background-color:black;
+    color:gold;
+    font-size:medium;
+}
+
+.section{
+    display:none;
+    margin-top:20px;
+}
+
+input{
+    margin:5px 0;
+    padding:6px;
+    width:250px;
+
+    border-radius:15px;
+    border:2px solid gold;
+    background-color:black;
+    color:gold;
+    font-size:medium;
+}
+
+h1{
+    background-color:blue;
+    color:aliceblue;
+}
