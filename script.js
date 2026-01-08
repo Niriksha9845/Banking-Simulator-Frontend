@@ -105,7 +105,7 @@ function viewAccount(){
 }
 
 function listAccount(){
-    fetch(BASE_URL+"/accounts")
+    fetch(BASE_URL+"/accounts/all")
     .then(res => res.json())
     .then(data => {
         document.getElementById("list-result").innerText = JSON.stringify(data);
