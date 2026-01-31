@@ -134,4 +134,4 @@ function refreshStaffView() {
         alert("Could not connect to Staff Backend. Is the server running?");
         console.error("Staff fetch failed", err);
     });
-}
+} 
