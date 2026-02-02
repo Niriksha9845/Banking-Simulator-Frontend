@@ -89,7 +89,7 @@ function viewSingleAccount() {
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
-            // FIX: Replaced 'name' with 'holderName'
+            // FIX: Replaced 'name' with 'holderName' to match Java model
             resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;">
                 <strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}
             </div>`;
@@ -106,7 +106,7 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // All keys match the API's JSON output and Account.java exactly
+            // FIX: All keys match the API's JSON output and Account.java exactly
             html += `<tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td>
