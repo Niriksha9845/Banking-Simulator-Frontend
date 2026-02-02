@@ -98,16 +98,17 @@ function viewSingleAccount() {
 }
 
 // --- LIST ALL ACCOUNTS (THE "UNDEFINED" FIX) ---
+// --- LIST ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // Updated to use acc.name
+            // FIX: Use holderName to match your Java Account model exactly
             html += `<tr>
                 <td>${acc.accountNumber}</td>
-                <td>${acc.name}</td> 
+                <td>${acc.holderName}</td> 
                 <td>${acc.email}</td>
                 <td>$${acc.balance}</td>
             </tr>`;
