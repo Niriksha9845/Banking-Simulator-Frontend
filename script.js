@@ -23,7 +23,6 @@ function showSection(sectionId) {
 }
 
 function createAccount() {
-    // Matches the AccountRequest class in ApiServer.java
     const data = {
         name: document.getElementById("c-name").value,
         email: document.getElementById("c-email").value,
@@ -36,7 +35,8 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        alert("Success! Account Created for: " + result.holderName);
+        // Fix: Use holderName to match the backend
+        alert("Success! Account Created for: " + (result.holderName || "New User"));
         listAccount();
     }).catch(err => alert("Error creating account."));
 }
@@ -44,7 +44,6 @@ function createAccount() {
 function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
-    // Note: Ensure your ApiServer has a route for /accounts/deposit matching this
     fetch(BASE_URL + `/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { method: "POST" })
     .then(res => res.json())
     .then(result => {
@@ -80,11 +79,11 @@ function viewSingleAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
-        // Matches JSON key 'accountNumber'
+        // Find the account using the correct key
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
-            // Fix: Changed acc.name to acc.holderName
+            // Fix: Use holderName instead of name
             resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;"><strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}</div>`;
         } else {
             resultDiv.innerHTML = "<p style='color:red;'>Account not found.</p>";
@@ -98,13 +97,13 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // Fix: All keys match the JSON output
+            // Fix: Ensure all keys (accountNumber, holderName, email, balance) match the JSON
             html += `<tr>
-                        <td>${acc.accountNumber}</td>
-                        <td>${acc.holderName}</td>
-                        <td>${acc.email}</td>
-                        <td>$${acc.balance}</td>
-                     </tr>`;
+                <td>${acc.accountNumber}</td>
+                <td>${acc.holderName}</td> 
+                <td>${acc.email}</td>
+                <td>$${acc.balance}</td>
+            </tr>`;
         });
         document.getElementById("accounts-data").innerHTML = html;
     });
@@ -124,7 +123,7 @@ function refreshStaffView() {
         const listElement = document.getElementById("staff-names-list");
         listElement.innerHTML = ""; 
 
-        if (staffData.length === 0) {
+        if (!staffData || staffData.length === 0) {
             listElement.innerHTML = "<li>No staff members found.</li>";
         } else {
             staffData.forEach(member => {
