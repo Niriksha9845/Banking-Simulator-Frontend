@@ -17,13 +17,13 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
-    // Automatically refresh stats if staff section is opened
     if(sectionId === 'staff') {
         refreshStaffView();
     }
 }
 
 function createAccount() {
+    // Matches the AccountRequest class in ApiServer.java
     const data = {
         name: document.getElementById("c-name").value,
         email: document.getElementById("c-email").value,
@@ -36,7 +36,7 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        alert("Success! Account Number: " + result.accountNumber);
+        alert("Success! Account Created for: " + result.holderName);
         listAccount();
     }).catch(err => alert("Error creating account."));
 }
@@ -44,6 +44,7 @@ function createAccount() {
 function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
+    // Note: Ensure your ApiServer has a route for /accounts/deposit matching this
     fetch(BASE_URL + `/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { method: "POST" })
     .then(res => res.json())
     .then(result => {
@@ -79,9 +80,11 @@ function viewSingleAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
+        // Matches JSON key 'accountNumber'
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
+            // Fix: Changed acc.name to acc.holderName
             resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;"><strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}</div>`;
         } else {
             resultDiv.innerHTML = "<p style='color:red;'>Account not found.</p>";
@@ -95,15 +98,19 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            html += `<tr><td>${acc.accountNumber}</td><td>${acc.holderName}</td><td>${acc.email}</td><td>$${acc.balance}</td></tr>`;
+            // Fix: All keys match the JSON output
+            html += `<tr>
+                        <td>${acc.accountNumber}</td>
+                        <td>${acc.holderName}</td>
+                        <td>${acc.email}</td>
+                        <td>$${acc.balance}</td>
+                     </tr>`;
         });
         document.getElementById("accounts-data").innerHTML = html;
     });
 }
 
-// NEW STAFF VIEW FUNCTION
 function refreshStaffView() {
-    // 1. Update the account count (Existing logic)
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
@@ -111,12 +118,11 @@ function refreshStaffView() {
     })
     .catch(err => console.error("Account fetch failed"));
 
-    // 2. NEW: Fetch and display staff names from your new StaffController
     fetch(BASE_URL + "/staff/all")
     .then(res => res.json())
     .then(staffData => {
         const listElement = document.getElementById("staff-names-list");
-        listElement.innerHTML = ""; // Clear current list
+        listElement.innerHTML = ""; 
 
         if (staffData.length === 0) {
             listElement.innerHTML = "<li>No staff members found.</li>";
@@ -128,10 +134,8 @@ function refreshStaffView() {
                 listElement.appendChild(li);
             });
         }
-        console.log("Staff data refreshed successfully!");
     })
     .catch(err => {
-        alert("Could not connect to Staff Backend. Is the server running?");
         console.error("Staff fetch failed", err);
     });
-} 
+}
