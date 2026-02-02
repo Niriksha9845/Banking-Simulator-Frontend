@@ -17,7 +17,6 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
-    // Automatically refresh stats if staff section is opened
     if(sectionId === 'staff') {
         refreshStaffView();
     }
@@ -37,7 +36,7 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        // MATCHING: Account.java variable 'holderName'
+        // MATCHING: Account.java field 'holderName'
         alert("Success! Account Created for: " + (result.holderName || "User"));
         listAccount();
     }).catch(err => alert("Error creating account. Check server status."));
@@ -85,11 +84,10 @@ function viewSingleAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
-        // Matches the 'accountNumber' key in your JSON
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
-            // FIX: Replaced 'name' with 'holderName' to match Java model
+            // FIX: Using holderName to match Java
             resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;">
                 <strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}
             </div>`;
@@ -99,14 +97,14 @@ function viewSingleAccount() {
     });
 }
 
-// --- LIST ALL ACCOUNTS ---
+// --- LIST ALL ACCOUNTS (THE "UNDEFINED" FIX) ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // FIX: All keys match the API's JSON output and Account.java exactly
+            // FIX: Keys match the API output seen in your browser
             html += `<tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td>
@@ -124,27 +122,5 @@ function refreshStaffView() {
     .then(res => res.json())
     .then(data => {
         document.getElementById("staff-count").innerText = data.length;
-    })
-    .catch(err => console.error("Account fetch failed"));
-
-    fetch(BASE_URL + "/staff/all")
-    .then(res => res.json())
-    .then(staffData => {
-        const listElement = document.getElementById("staff-names-list");
-        listElement.innerHTML = ""; 
-
-        if (!staffData || staffData.length === 0) {
-            listElement.innerHTML = "<li>No staff members found.</li>";
-        } else {
-            staffData.forEach(member => {
-                const li = document.createElement("li");
-                li.style.padding = "5px 0";
-                li.innerHTML = `👤 <strong>${member.name}</strong> - <span style="color: #666;">${member.role}</span>`;
-                listElement.appendChild(li);
-            });
-        }
-    })
-    .catch(err => {
-        console.error("Staff fetch failed", err);
     });
 }
