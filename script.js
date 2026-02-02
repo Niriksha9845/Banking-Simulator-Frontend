@@ -17,6 +17,7 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
+    // Automatically refresh stats if staff section is opened
     if(sectionId === 'staff') {
         refreshStaffView();
     }
@@ -35,10 +36,10 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        // Fix: Use holderName to match the backend
-        alert("Success! Account Created for: " + (result.holderName || "New User"));
+        // Corrected to use holderName from your API
+        alert("Success! Account Created for: " + (result.holderName || "User"));
         listAccount();
-    }).catch(err => alert("Error creating account."));
+    }).catch(err => alert("Error creating account. Check server status."));
 }
 
 function depositMoney() {
@@ -79,12 +80,14 @@ function viewSingleAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
-        // Find the account using the correct key
+        // Matches the 'accountNumber' key in your JSON
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
-            // Fix: Use holderName instead of name
-            resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;"><strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}</div>`;
+            // Fix: Replaced 'name' with 'holderName'
+            resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;">
+                <strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}
+            </div>`;
         } else {
             resultDiv.innerHTML = "<p style='color:red;'>Account not found.</p>";
         }
@@ -97,10 +100,10 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // Fix: Ensure all keys (accountNumber, holderName, email, balance) match the JSON
+            // All keys match the API's JSON output exactly
             html += `<tr>
                 <td>${acc.accountNumber}</td>
-                <td>${acc.holderName}</td> 
+                <td>${acc.holderName}</td>
                 <td>${acc.email}</td>
                 <td>$${acc.balance}</td>
             </tr>`;
