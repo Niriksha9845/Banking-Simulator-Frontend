@@ -104,9 +104,10 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
+            // Updated to use acc.name
             html += `<tr>
                 <td>${acc.accountNumber}</td>
-                <td>${acc.holderName}</td> 
+                <td>${acc.name}</td> 
                 <td>${acc.email}</td>
                 <td>$${acc.balance}</td>
             </tr>`;
