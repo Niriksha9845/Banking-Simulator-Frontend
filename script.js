@@ -23,6 +23,7 @@ function showSection(sectionId) {
     }
 }
 
+// --- CREATE ACCOUNT ---
 function createAccount() {
     const data = {
         name: document.getElementById("c-name").value,
@@ -42,6 +43,7 @@ function createAccount() {
     }).catch(err => alert("Error creating account. Check server status."));
 }
 
+// --- DEPOSIT ---
 function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
@@ -53,6 +55,7 @@ function depositMoney() {
     }).catch(err => alert("Deposit failed. Check account number exists."));
 }
 
+// --- WITHDRAW ---
 function withdrawMoney() {
     const accNum = document.getElementById("w-acc-num").value;
     const amount = document.getElementById("w-amount").value;
@@ -64,6 +67,7 @@ function withdrawMoney() {
     }).catch(err => alert("Withdraw failed. Check balance."));
 }
 
+// --- TRANSFER ---
 function transferMoney() {
     const fromAcc = document.getElementById("t-from-acc").value;
     const toAcc = document.getElementById("t-to-acc").value;
@@ -75,6 +79,7 @@ function transferMoney() {
     }).catch(err => alert("Transfer failed."));
 }
 
+// --- VIEW SINGLE ACCOUNT ---
 function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
     fetch(BASE_URL + "/accounts/all")
@@ -94,6 +99,7 @@ function viewSingleAccount() {
     });
 }
 
+// --- LIST ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
@@ -112,6 +118,7 @@ function listAccount() {
     });
 }
 
+// --- STAFF VIEW ---
 function refreshStaffView() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
