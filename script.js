@@ -1,4 +1,4 @@
-const BASE_URL = "https://banking-simulator-backend-production.up.railway.app";
+const BASE_URL = "https://my-bank-api-v2.up.railway.app";
 
 function showAuth(formId) {
     document.getElementById('hero-section').style.display = 'none';
