@@ -42,16 +42,23 @@ function createAccount() {
     }).catch(err => alert("Error creating account. Check server status."));
 }
 
-// --- DEPOSIT ---
-function depositMoney() {
+// --- DEPOSIT ---\function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
-    fetch(BASE_URL + `/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { method: "POST" })
-    .then(res => res.json())
+
+    // We send data in the URL so req.queryParams can read it
+    fetch(BASE_URL + `/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { 
+        method: "POST" 
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Account not found");
+        return res.json();
+    })
     .then(result => {
         alert("Deposit Successful! New Balance: $" + result.balance);
-        listAccount();
-    }).catch(err => alert("Deposit failed. Check account number exists."));
+        listAccount(); // Refresh the table to show the new money
+    })
+    .catch(err => alert("Deposit failed: " + err.message));
 }
 
 // --- WITHDRAW ---
