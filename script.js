@@ -106,13 +106,14 @@ function transferMoney() {
 }
 
 // --- VIEW ALL ACCOUNTS ---
+// --- LIST ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // FIX: Use acc.name to match your Java variable 'private String name'
+            // Use acc.name to match 'private String name' in your Java Account class
             html += `<tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.name}</td> 
