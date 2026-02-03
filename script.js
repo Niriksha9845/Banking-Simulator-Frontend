@@ -49,25 +49,19 @@ function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
 
-    // FIX: Changed /transactions/deposite to /accounts/deposit
+    // FIX: Change /transactions/deposite to /accounts/deposit
     const url = `${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`;
     
-    console.log("Calling URL:", url); 
-
     fetch(url, { method: "POST" })
     .then(res => {
-        if (!res.ok) {
-            return res.text().then(text => { throw new Error(text) });
-        }
+        if (!res.ok) throw new Error("Account not found. Ensure you created it first.");
         return res.json();
     })
     .then(result => {
         alert("Deposit Successful! New Balance: $" + result.balance);
-        listAccount();
+        listAccount(); 
     })
-    .catch(err => {
-        alert("Server Error: 404 Not Found. Make sure the account number exists in the list below.");
-    });
+    .catch(err => alert("Error: " + err.message));
 }
 // --- WITHDRAW ---
 function withdrawMoney() {
