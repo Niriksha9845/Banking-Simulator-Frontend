@@ -102,18 +102,19 @@ function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
     if (!accNum) return alert("Please enter an account number");
 
-    // This URL matches your Java code: get("/accounts/:accNo")
+    // This matches your Java code: get("/accounts/:accNo") 
+    // It sends the number as part of the address, not as a ?parameter
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
         if (!res.ok) throw new Error("Account not found. Create a NEW one after this update!");
         return res.json();
     })
     .then(acc => {
+        // This will now show the actual data
         alert(`Account Found!\nOwner: ${acc.holderName}\nBalance: $${acc.balance}`);
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert("Error: " + err.message));
 }
-
 // --- VIEW ALL ACCOUNTS ---
 // --- LIST ALL ACCOUNTS ---
 function listAccount() {
