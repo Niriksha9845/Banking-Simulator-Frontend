@@ -48,28 +48,27 @@ function createAccount() {
 function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
-    
+
+    // FIX: Changed /transactions/deposite to /accounts/deposit
     const url = `${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`;
+    
     console.log("Calling URL:", url); 
 
     fetch(url, { method: "POST" })
     .then(res => {
         if (!res.ok) {
-            // This captures the exact HTML error seen in alerts
             return res.text().then(text => { throw new Error(text) });
         }
         return res.json();
     })
     .then(result => {
         alert("Deposit Successful! New Balance: $" + result.balance);
-        listAccount(); 
+        listAccount();
     })
     .catch(err => {
-        console.error("Full Error:", err);
-        alert("Deposit failed: Check if Account exists in 'View All Accounts'");
+        alert("Server Error: 404 Not Found. Make sure the account number exists in the list below.");
     });
 }
-
 // --- WITHDRAW ---
 function withdrawMoney() {
     const accNum = document.getElementById("w-acc-num").value;
