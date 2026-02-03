@@ -107,16 +107,17 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // FIX: Match the 'holderName' variable from your Java Account class
+            // CHANGE acc.name TO acc.holderName
             html += `<tr>
-                <td>${acc.accountNumber}</td>
-                <td>${acc.holderName}</td> 
-                <td>${acc.email}</td>
-                <td>$${acc.balance}</td>
-            </tr>`;
+                        <td>${acc.accountNumber}</td>
+                        <td>${acc.holderName}</td>
+                        <td>${acc.email}</td>
+                        <td>$${acc.balance}</td>
+                    </tr>`;
         });
         document.getElementById("accounts-data").innerHTML = html;
-    });
+    })
+    .catch(err => console.error("Could not load account list"));
 }
 
 // --- STAFF VIEW ---
