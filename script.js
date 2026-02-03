@@ -102,17 +102,16 @@ function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
     if (!accNum) return alert("Please enter an account number");
 
-    // FIX: This sends the number directly in the URL path to match your Java @get("/accounts/:accNo")
+    // This URL matches your Java code: get("/accounts/:accNo")
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
-        if (!res.ok) throw new Error("Account not found. Ensure you created it AFTER the last restart.");
+        if (!res.ok) throw new Error("Account not found. Create a NEW one after this update!");
         return res.json();
     })
     .then(acc => {
-        // This will now successfully show the name and balance
         alert(`Account Found!\nOwner: ${acc.holderName}\nBalance: $${acc.balance}`);
     })
-    .catch(err => alert("Error: " + err.message));
+    .catch(err => alert(err.message));
 }
 
 // --- VIEW ALL ACCOUNTS ---
