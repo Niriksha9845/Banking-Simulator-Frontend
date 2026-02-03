@@ -108,22 +108,22 @@ function viewSingleAccount() {
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
         if (!res.ok) {
-            table.style.display = "none"; // Hide table if no account is found
-            throw new Error("Account not found. Create a NEW one after restarts!");
+            table.style.display = "none"; // Hide table if account is missing
+            throw new Error("Account not found.");
         }
         return res.json();
     })
     .then(acc => {
-        // Step 1: Make the table visible
+        // Switch table from display:none to display:table
         table.style.display = "table"; 
         
-        // Step 2: Insert the data row into the table body
+        // Populate the table body with the account info
         tbody.innerHTML = `
             <tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td>
                 <td>${acc.email}</td>
-                <td style="font-weight: bold; color: #4CAF50;">$${acc.balance}</td>
+                <td style="color: #4CAF50; font-weight: bold;">$${acc.balance}</td>
             </tr>
         `;
     })
