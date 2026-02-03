@@ -112,10 +112,10 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // Matches your Java Account model exactly
+            // FIX: Use acc.name to match your Java variable 'private String name'
             html += `<tr>
                 <td>${acc.accountNumber}</td>
-                <td>${acc.holderName}</td> 
+                <td>${acc.name}</td> 
                 <td>${acc.email}</td>
                 <td>$${acc.balance}</td>
             </tr>`;
