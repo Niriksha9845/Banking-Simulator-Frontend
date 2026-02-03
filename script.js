@@ -1,5 +1,6 @@
 const BASE_URL = "https://my-bank-api-v2.up.railway.app";
 
+// --- NAVIGATION & AUTHENTICATION ---
 function showAuth(formId) {
     document.getElementById('hero-section').style.display = 'none';
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
@@ -17,9 +18,9 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
-    if(sectionId === 'staff') {
-        refreshStaffView();
-    }
+    // Refresh data automatically when switching views
+    if (sectionId === 'list') listAccount();
+    if (sectionId === 'staff') refreshStaffView();
 }
 
 // --- CREATE ACCOUNT ---
@@ -36,27 +37,28 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        // MATCHING: Account.java field 'holderName'
+        // Matches holderName variable in your Java model
         alert("Success! Account Created for: " + (result.holderName || "User"));
         listAccount();
-    }).catch(err => alert("Error creating account. Check server status."));
+    })
+    .catch(err => alert("Error creating account. Check server status."));
 }
 
-// --- DEPOSIT ---\function depositMoney() {
+// --- DEPOSIT ---
+function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
 
-    // We send data in the URL so req.queryParams can read it
-    fetch(BASE_URL + `/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { 
+    fetch(`${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { 
         method: "POST" 
     })
     .then(res => {
-        if (!res.ok) throw new Error("Account not found");
+        if (!res.ok) throw new Error("404: Account not found on server");
         return res.json();
     })
     .then(result => {
         alert("Deposit Successful! New Balance: $" + result.balance);
-        listAccount(); // Refresh the table to show the new money
+        listAccount(); 
     })
     .catch(err => alert("Deposit failed: " + err.message));
 }
@@ -65,12 +67,19 @@ function createAccount() {
 function withdrawMoney() {
     const accNum = document.getElementById("w-acc-num").value;
     const amount = document.getElementById("w-amount").value;
-    fetch(BASE_URL + `/accounts/withdraw?accountNumber=${accNum}&amount=${amount}`, { method: "POST" })
-    .then(res => res.json())
+
+    fetch(`${BASE_URL}/accounts/withdraw?accountNumber=${accNum}&amount=${amount}`, { 
+        method: "POST" 
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Check balance or account number");
+        return res.json();
+    })
     .then(result => {
         alert("Withdraw Successful! New Balance: $" + result.balance);
         listAccount();
-    }).catch(err => alert("Withdraw failed. Check balance."));
+    })
+    .catch(err => alert("Withdraw failed: " + err.message));
 }
 
 // --- TRANSFER ---
@@ -78,11 +87,16 @@ function transferMoney() {
     const fromAcc = document.getElementById("t-from-acc").value;
     const toAcc = document.getElementById("t-to-acc").value;
     const amount = document.getElementById("t-amount").value;
-    fetch(BASE_URL + `/accounts/transfer?fromAccNum=${fromAcc}&toAccNum=${toAcc}&amount=${amount}`, { method: "POST" })
-    .then(() => {
+
+    fetch(`${BASE_URL}/accounts/transfer?fromAccNum=${fromAcc}&toAccNum=${toAcc}&amount=${amount}`, { 
+        method: "POST" 
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("One or both accounts not found");
         alert("Transfer Successful!");
         listAccount();
-    }).catch(err => alert("Transfer failed."));
+    })
+    .catch(err => alert("Transfer failed: " + err.message));
 }
 
 // --- VIEW SINGLE ACCOUNT ---
@@ -94,7 +108,6 @@ function viewSingleAccount() {
         const acc = data.find(a => a.accountNumber === accNum);
         const resultDiv = document.getElementById("view-result");
         if (acc) {
-            // FIX: Using holderName to match Java
             resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;">
                 <strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}
             </div>`;
@@ -104,7 +117,6 @@ function viewSingleAccount() {
     });
 }
 
-// --- LIST ALL ACCOUNTS (THE "UNDEFINED" FIX) ---
 // --- LIST ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
@@ -112,7 +124,6 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // FIX: Use holderName to match your Java Account model exactly
             html += `<tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td> 
