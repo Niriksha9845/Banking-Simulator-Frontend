@@ -98,6 +98,7 @@ function transferMoney() {
     })
     .catch(err => alert("Transfer failed: " + err.message));
 }
+
 function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
     const table = document.getElementById("result-table");
@@ -108,26 +109,29 @@ function viewSingleAccount() {
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
         if (!res.ok) {
-            table.style.display = "none"; // Hide table if account doesn't exist
-            throw new Error("Account not found. Create a NEW one after restarts!");
+            table.style.display = "none"; // Hide table if search fails
+            throw new Error("Account not found in server memory.");
         }
         return res.json();
     })
     .then(acc => {
-        // Step 1: Switch table from hidden to visible
+        // 1. Reveal the table
         table.style.display = "table"; 
         
-        // Step 2: Insert the account details into the table body
+        // 2. Inject the structured row
         tbody.innerHTML = `
             <tr>
-                <td>${acc.accountNumber}</td>
-                <td>${acc.holderName}</td>
+                <td style="color: #bdc3c7;">#${acc.accountNumber}</td>
+                <td style="font-weight: bold;">${acc.holderName}</td>
                 <td>${acc.email}</td>
-                <td style="color: #4CAF50; font-weight: bold;">$${acc.balance}</td>
+                <td style="color: #2ecc71; font-weight: bold;">$${acc.balance}</td>
             </tr>
         `;
     })
-    .catch(err => alert(err.message));
+    .catch(err => {
+        table.style.display = "none";
+        alert(err.message);
+    });
 }
 // --- VIEW ALL ACCOUNTS ---
 // --- LIST ALL ACCOUNTS ---
