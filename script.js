@@ -18,7 +18,7 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
-    // Refresh data automatically when switching views
+    // Auto-refresh data when switching views
     if (sectionId === 'list') listAccount();
     if (sectionId === 'staff') refreshStaffView();
 }
@@ -44,23 +44,30 @@ function createAccount() {
     .catch(err => alert("Error creating account. Check server status."));
 }
 
-// --- DEPOSIT ---
+// --- DEPOSIT (The specific debug fix for your 404) ---
 function depositMoney() {
     const accNum = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
+    
+    const url = `${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`;
+    console.log("Calling URL:", url); 
 
-    fetch(`${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`, { 
-        method: "POST" 
-    })
+    fetch(url, { method: "POST" })
     .then(res => {
-        if (!res.ok) throw new Error("404: Account not found on server");
+        if (!res.ok) {
+            // This captures the exact HTML error seen in alerts
+            return res.text().then(text => { throw new Error(text) });
+        }
         return res.json();
     })
     .then(result => {
         alert("Deposit Successful! New Balance: $" + result.balance);
         listAccount(); 
     })
-    .catch(err => alert("Deposit failed: " + err.message));
+    .catch(err => {
+        console.error("Full Error:", err);
+        alert("Deposit failed: Check if Account exists in 'View All Accounts'");
+    });
 }
 
 // --- WITHDRAW ---
@@ -99,31 +106,14 @@ function transferMoney() {
     .catch(err => alert("Transfer failed: " + err.message));
 }
 
-// --- VIEW SINGLE ACCOUNT ---
-function viewSingleAccount() {
-    const accNum = document.getElementById("v-acc-num").value;
-    fetch(BASE_URL + "/accounts/all")
-    .then(res => res.json())
-    .then(data => {
-        const acc = data.find(a => a.accountNumber === accNum);
-        const resultDiv = document.getElementById("view-result");
-        if (acc) {
-            resultDiv.innerHTML = `<div class="account-row" style="margin-top:10px;">
-                <strong>Holder:</strong> ${acc.holderName} | <strong>Balance:</strong> $${acc.balance}
-            </div>`;
-        } else {
-            resultDiv.innerHTML = "<p style='color:red;'>Account not found.</p>";
-        }
-    });
-}
-
-// --- LIST ALL ACCOUNTS ---
+// --- VIEW ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
     .then(res => res.json())
     .then(data => {
         let html = "";
         data.forEach(acc => {
+            // Matches your Java Account model exactly
             html += `<tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td> 
