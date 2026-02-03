@@ -109,20 +109,22 @@ function viewSingleAccount() {
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
         if (!res.ok) {
-            table.style.display = "none"; // Hide table if search fails
+            table.style.display = "none"; // Hide table if no account found
             throw new Error("Account not found in server memory.");
         }
         return res.json();
     })
     .then(acc => {
-        // 1. Reveal the table
+        // 1. THIS REMOVES THE POPUP: No more alert() here!
+        
+        // 2. MAKE THE TABLE VISIBLE
         table.style.display = "table"; 
         
-        // 2. Inject the structured row
+        // 3. INJECT THE DATA INTO THE TABLE ROWS
         tbody.innerHTML = `
-            <tr>
-                <td style="color: #bdc3c7;">#${acc.accountNumber}</td>
-                <td style="font-weight: bold;">${acc.holderName}</td>
+            <tr style="color: white; background: #34495e;">
+                <td>${acc.accountNumber}</td>
+                <td>${acc.holderName}</td>
                 <td>${acc.email}</td>
                 <td style="color: #2ecc71; font-weight: bold;">$${acc.balance}</td>
             </tr>
@@ -130,7 +132,7 @@ function viewSingleAccount() {
     })
     .catch(err => {
         table.style.display = "none";
-        alert(err.message);
+        alert(err.message); // Only alert if there is a real system error
     });
 }
 // --- VIEW ALL ACCOUNTS ---
