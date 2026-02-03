@@ -100,20 +100,32 @@ function transferMoney() {
 }
 function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
+    const table = document.getElementById("result-table");
+    const tbody = document.getElementById("single-account-data");
+
     if (!accNum) return alert("Please enter an account number");
 
-    // This matches your Java code: get("/accounts/:accNo") 
-    // It sends the number as part of the address, not as a ?parameter
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
-        if (!res.ok) throw new Error("Account not found. Create a NEW one after this update!");
+        if (!res.ok) {
+            table.style.display = "none"; // Hide table if not found
+            throw new Error("Account not found.");
+        }
         return res.json();
     })
     .then(acc => {
-        // This will now show the actual data
-        alert(`Account Found!\nOwner: ${acc.holderName}\nBalance: $${acc.balance}`);
+        // Show the table and fill it with data
+        table.style.display = "table"; 
+        tbody.innerHTML = `
+            <tr>
+                <td>${acc.accountNumber}</td>
+                <td>${acc.holderName}</td>
+                <td>${acc.email}</td>
+                <td>$${acc.balance}</td>
+            </tr>
+        `;
     })
-    .catch(err => alert("Error: " + err.message));
+    .catch(err => alert(err.message));
 }
 // --- VIEW ALL ACCOUNTS ---
 // --- LIST ALL ACCOUNTS ---
