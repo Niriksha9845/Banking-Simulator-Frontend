@@ -92,8 +92,26 @@
                 <div class="input-container"><input type="number" id="t-amount" placeholder="Amount"></div>
                 <div class="button-container"><button onclick="transferMoney()">Submit</button></div>
             </div>
+<div id="view" class="section" style="display:none;">
+    <h3>View Account Details</h3>
+    <input type="text" id="v-acc-num" placeholder="Enter Account Number">
+    <button onclick="viewSingleAccount()">Search</button>
 
-            <div id="view" class="section">
+    <div id="single-account-result" style="margin-top: 20px;">
+        <table border="1" style="width:100%; border-collapse: collapse; display: none;" id="result-table">
+            <thead>
+                <tr style="background-color: #f2f2f2; color: black;">
+                    <th>Account Number</th>
+                    <th>Holder Name</th>
+                    <th>Email</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody id="single-account-data" style="text-align: center; color: white;">
+                </tbody>
+        </table>
+    </div>
+</div>
                 <h2>View Account Details</h2>
                 <div class="input-container"><input type="text" id="v-acc-num" placeholder="Account Number"></div>
                 <div class="button-container"><button onclick="viewSingleAccount()">Search</button></div>
