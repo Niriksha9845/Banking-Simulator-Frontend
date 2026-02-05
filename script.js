@@ -1,4 +1,4 @@
-const BASE_URL = "https://my-bank-api-v2.up.railway.app";
+const BASE_URL = "http://localhost:8080";
 
 // --- NAVIGATION & AUTHENTICATION ---
 function showAuth(formId) {
@@ -18,7 +18,6 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
     
-    // Auto-refresh data when switching views
     if (sectionId === 'list') listAccount();
     if (sectionId === 'staff') refreshStaffView();
 }
@@ -37,46 +36,55 @@ function createAccount() {
     })
     .then(res => res.json())
     .then(result => {
-        // Matches holderName variable in your Java model
-        alert("Success! Account Created for: " + (result.holderName || "User"));
+        alert("Success! Account Created. Your Account Number is: " + result.accountNumber);
         listAccount();
     })
     .catch(err => alert("Error creating account. Check server status."));
 }
 
-// --- DEPOSIT (The specific debug fix for your 404) ---
+// --- DEPOSIT ---
 function depositMoney() {
-    const accNum = document.getElementById("d-acc-num").value;
+    const accNo = document.getElementById("d-acc-num").value;
     const amount = document.getElementById("d-amount").value;
-
-    // FIX: Change /transactions/deposite to /accounts/deposit
-    const url = `${BASE_URL}/accounts/deposit?accountNumber=${accNum}&amount=${amount}`;
     
-    fetch(url, { method: "POST" })
-    .then(res => {
-        if (!res.ok) throw new Error("Account not found. Ensure you created it first.");
-        return res.json();
+    // UPDATED: Matches Java TxRequest class
+    const data = { accNo, amount: parseFloat(amount) };
+
+    fetch(`${BASE_URL}/transactions/deposite`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
     })
+    .then(res => res.text()) // Java returns a simple String
     .then(result => {
-        alert("Deposit Successful! New Balance: $" + result.balance);
+        alert(result);
         listAccount(); 
     })
     .catch(err => alert("Error: " + err.message));
 }
+
 // --- WITHDRAW ---
 function withdrawMoney() {
-    const accNum = document.getElementById("w-acc-num").value;
+    const accNo = document.getElementById("w-acc-num").value;
     const amount = document.getElementById("w-amount").value;
 
-    fetch(`${BASE_URL}/accounts/withdraw?accountNumber=${accNum}&amount=${amount}`, { 
-        method: "POST" 
+    // This object must match the 'TxRequest' class in your ApiServer.java
+    const data = { 
+        accNo: accNo, 
+        amount: parseFloat(amount) 
+    };
+
+    fetch(`${BASE_URL}/transactions/withdraw`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
     })
     .then(res => {
         if (!res.ok) throw new Error("Check balance or account number");
-        return res.json();
+        return res.text(); // Use .text() because Java returns a String message
     })
     .then(result => {
-        alert("Withdraw Successful! New Balance: $" + result.balance);
+        alert(result); // Should show "Withdraw successfully..!"
         listAccount();
     })
     .catch(err => alert("Withdraw failed: " + err.message));
@@ -88,17 +96,23 @@ function transferMoney() {
     const toAcc = document.getElementById("t-to-acc").value;
     const amount = document.getElementById("t-amount").value;
 
-    fetch(`${BASE_URL}/accounts/transfer?fromAccNum=${fromAcc}&toAccNum=${toAcc}&amount=${amount}`, { 
-        method: "POST" 
+    // UPDATED: Matches Java TransferRequest class
+    const data = { fromAcc, toAcc, amount: parseFloat(amount) };
+
+    fetch(`${BASE_URL}/transactions/transfer`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
     })
-    .then(res => {
-        if (!res.ok) throw new Error("One or both accounts not found");
-        alert("Transfer Successful!");
+    .then(res => res.text()) // Java returns a simple String
+    .then(result => {
+        alert(result);
         listAccount();
     })
-    .catch(err => alert("Transfer failed: " + err.message));
+    .catch(err => alert("Error: " + err.message));
 }
 
+// --- VIEW SINGLE ACCOUNT ---
 function viewSingleAccount() {
     const accNum = document.getElementById("v-acc-num").value;
     const table = document.getElementById("result-table");
@@ -109,33 +123,28 @@ function viewSingleAccount() {
     fetch(`${BASE_URL}/accounts/${accNum}`)
     .then(res => {
         if (!res.ok) {
-            table.style.display = "none"; // Hide table if no account found
-            throw new Error("Account not found in server memory.");
+            table.style.display = "none";
+            throw new Error("Account not found.");
         }
         return res.json();
     })
     .then(acc => {
-        // 1. THIS REMOVES THE POPUP: No more alert() here!
-        
-        // 2. MAKE THE TABLE VISIBLE
         table.style.display = "table"; 
-        
-        // 3. INJECT THE DATA INTO THE TABLE ROWS
         tbody.innerHTML = `
-            <tr style="color: white; background: #34495e;">
+            <tr>
                 <td>${acc.accountNumber}</td>
                 <td>${acc.holderName}</td>
                 <td>${acc.email}</td>
-                <td style="color: #2ecc71; font-weight: bold;">$${acc.balance}</td>
+                <td class="balance-cell">$${acc.balance}</td>
             </tr>
         `;
     })
     .catch(err => {
         table.style.display = "none";
-        alert(err.message); // Only alert if there is a real system error
+        alert(err.message);
     });
 }
-// --- VIEW ALL ACCOUNTS ---
+
 // --- LIST ALL ACCOUNTS ---
 function listAccount() {
     fetch(BASE_URL + "/accounts/all")
@@ -143,7 +152,6 @@ function listAccount() {
     .then(data => {
         let html = "";
         data.forEach(acc => {
-            // CHANGE acc.name TO acc.holderName
             html += `<tr>
                         <td>${acc.accountNumber}</td>
                         <td>${acc.holderName}</td>
@@ -157,10 +165,3 @@ function listAccount() {
 }
 
 // --- STAFF VIEW ---
-function refreshStaffView() {
-    fetch(BASE_URL + "/accounts/all")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("staff-count").innerText = data.length;
-    });
-}
